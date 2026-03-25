@@ -6,11 +6,11 @@ import {
   getBookById,
   updateBook,
   deleteBook,
-} from "../controllers/booksController";
+} from "../controllers/booksController.js";
 
-import borrowBook from "../controllers/bookBorrowController";
+import borrowBook from "../controllers/bookBorrowController.js";
 
-import returnBook from "../controllers/bookReturnController";
+import returnBook from "../controllers/bookReturnController.js";
 
 const router = express.Router();
 

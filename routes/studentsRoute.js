@@ -4,7 +4,7 @@ import {
   createStudent,
   getStudents,
   getStudentById,
-} from "../controllers/studentsController";
+} from "../controllers/studentsController.js";
 
 const router = express.Router();
 

@@ -5,7 +5,7 @@ import {
   getAuthorById,
   updateAuthor,
   deleteAuthor,
-} from "../controllers/authorsController";
+} from "../controllers/authorsController.js";
 
 const router = express.Router();
 

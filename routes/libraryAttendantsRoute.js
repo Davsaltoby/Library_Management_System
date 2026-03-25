@@ -3,7 +3,7 @@ import express from "express";
 import {
   createLibraryAttendant,
   getLibraryAttendants,
-} from "../controllers/libraryAttendantController";
+} from "../controllers/libraryAttendantController.js";
 
 const router = express.Router();
 

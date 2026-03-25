@@ -1,4 +1,6 @@
-export const createBook = (req, res) => {};
+export const createBook = (req, res) => {
+  res.status(201).json({ message: "Books API Working" });
+};
 
 export const getBooks = (req, res) => {};
 
