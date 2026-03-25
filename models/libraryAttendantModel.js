@@ -11,9 +11,6 @@ const libraryAttendantSchema = new Schema({
   },
 });
 
-const LibraryAttendant = mongoose.model(
-  "LibraryAttendant",
-  libraryAttendantSchema,
-);
+const LibraryAttendant = mongoose.model("Attendant", libraryAttendantSchema);
 
 export default LibraryAttendant;
