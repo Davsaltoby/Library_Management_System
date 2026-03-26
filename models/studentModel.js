@@ -2,15 +2,16 @@ import mongoose from "mongoose";
 
 const { Schema } = mongoose;
 
-const studentSchema = new Schema({
-  name: { type: string, required: true },
-  email: { type: string, unique: true },
-  studentId: { type: string, unique: true },
-  createdAt: {
-    type: Date,
-    default: Date.now,
+const studentSchema = new Schema(
+  {
+    name: { type: String, required: true },
+    email: { type: String, unique: true },
+    studentId: { type: String, unique: true },
   },
-});
+  {
+    timestamps: true,
+  },
+);
 
 const Student = mongoose.model("Student", studentSchema);
 

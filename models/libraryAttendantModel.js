@@ -2,14 +2,15 @@ import mongoose from "mongoose";
 
 const { Schema } = mongoose;
 
-const libraryAttendantSchema = new Schema({
-  name: { type: String, required: true },
-  staffId: { type: String, unique: true },
-  createdAt: {
-    type: Date,
-    default: Date.now,
+const libraryAttendantSchema = new Schema(
+  {
+    name: { type: String, required: true },
+    staffId: { type: String, unique: true },
   },
-});
+  {
+    timestamps: true,
+  },
+);
 
 const LibraryAttendant = mongoose.model("Attendant", libraryAttendantSchema);
 
