@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import Author from "./authorModel";
-import Student from "./studentModel";
-import LibraryAttendant from "./libraryAttendantModel";
+import Author from "./authorModel.js";
+import Student from "./studentModel.js";
+import LibraryAttendant from "./libraryAttendantModel.js";
 
 const { Schema } = mongoose;
 

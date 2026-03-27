@@ -7,13 +7,18 @@ import {
   deleteAuthor,
 } from "../controllers/authorsController.js";
 
+import {
+  validateCreateAuthor,
+  validateAuthorById,
+} from "../middleware/authorValidation/authorValidation.js";
+
 const router = express.Router();
 
-router.post("/", createAuthor);
+router.post("/", validateCreateAuthor, createAuthor);
 
 router.get("/", getAuthors);
 
-router.get("/:id", getAuthorById);
+router.get("/:id", validateAuthorById, getAuthorById);
 
 router.put("/:id", updateAuthor);
 

@@ -12,9 +12,11 @@ import borrowBook from "../controllers/bookBorrowController.js";
 
 import returnBook from "../controllers/bookReturnController.js";
 
+import { validateCreateBook } from "../middleware/bookValidation/validateBook.js";
+
 const router = express.Router();
 
-router.post("/", createBook);
+router.post("/", validateCreateBook, createBook);
 
 router.get("/", getBooks);
 
