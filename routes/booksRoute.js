@@ -12,7 +12,13 @@ import borrowBook from "../controllers/bookBorrowController.js";
 
 import returnBook from "../controllers/bookReturnController.js";
 
-import { validateCreateBook } from "../middleware/bookValidation/validateBook.js";
+import {
+  validateCreateBook,
+  validateBookById,
+  validateUpdateBook,
+} from "../middleware/bookValidation/validateBook.js";
+
+import { validateBorrowBook } from "../middleware/bookValidation/validateBorrowReturnBook.js";
 
 const router = express.Router();
 
@@ -20,15 +26,15 @@ router.post("/", validateCreateBook, createBook);
 
 router.get("/", getBooks);
 
-router.get("/:id", getBookById);
+router.get("/:id", validateBookById, getBookById);
 
-router.put("/:id", updateBook);
+router.put("/:id", validateBookById, validateUpdateBook, updateBook);
 
-router.delete("/:id", deleteBook);
+router.delete("/:id", validateBookById, deleteBook);
 
 // Borrow book route
 
-router.post("/:id/borrow", borrowBook);
+router.post("/:id/borrow", validateBorrowBook, borrowBook);
 
 // Return book route
 
