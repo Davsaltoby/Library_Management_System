@@ -46,9 +46,20 @@ export const getBooks = async (req, res) => {
 
 export const getBookById = async (req, res) => {
   try {
+    if (req.book.status === "OUT") {
+      const bookOut = await req.book.populate([
+        { path: "authors", select: "name bio" },
+        { path: "borrowedBy", select: "name email" },
+        { path: "issuedBy", select: "name staffId" },
+      ]);
+
+      return res
+        .status(200)
+        .json({ ok: true, message: "request successful", data: bookOut });
+    }
     res
       .status(200)
-      .json({ ok: true, message: "Request successful", data: req.book });
+      .json({ ok: true, message: "request successful", data: req.book });
   } catch (err) {
     res.status(500).json({ error: { message: "cannot get book" } });
     console.log(err.message);

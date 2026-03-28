@@ -43,6 +43,14 @@ export const validateBorrowBook = async (req, res, next) => {
     return res.status(404).json({ error: { message: "student not found" } });
   }
 
+  if (book.borrowedBy === studentId) {
+    return res.status(409).json({
+      error: {
+        message: `this book has already been borrowed by this student; ${student.name} with email ${student.email}`,
+      },
+    });
+  }
+
   const attendant = await LibraryAttendant.findById(attendantId);
   if (!attendant) {
     return res.status(404).json({ error: { message: "attendant not found" } });

@@ -18,7 +18,9 @@ import {
   validateUpdateBook,
 } from "../middleware/bookValidation/validateBook.js";
 
-import { validateBorrowBook } from "../middleware/bookValidation/validateBorrowReturnBook.js";
+import { validateBorrowBook } from "../middleware/bookValidation/validateBorrowBook.js";
+
+import validateReturnBook from "../middleware/bookValidation/validateReturnBook.js";
 
 const router = express.Router();
 
@@ -38,6 +40,6 @@ router.post("/:id/borrow", validateBorrowBook, borrowBook);
 
 // Return book route
 
-router.post("/:id/return", returnBook);
+router.post("/:id/return", validateReturnBook, returnBook);
 
 export default router;
