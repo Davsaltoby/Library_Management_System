@@ -9,8 +9,8 @@ import {
 } from "../controllers/booksController.js";
 
 import borrowBook from "../controllers/bookBorrowController.js";
-
 import returnBook from "../controllers/bookReturnController.js";
+import authorization from "../middleware/auth/authorization.js";
 
 import {
   validateCreateBook,
@@ -24,22 +24,48 @@ import validateReturnBook from "../middleware/bookValidation/validateReturnBook.
 
 const router = express.Router();
 
-router.post("/", validateCreateBook, createBook);
-
 router.get("/", getBooks);
 
 router.get("/:id", validateBookById, getBookById);
 
-router.put("/:id", validateBookById, validateUpdateBook, updateBook);
+router.post(
+  "/",
+  authorization("admin", "attendant"),
+  validateCreateBook,
+  createBook,
+);
 
-router.delete("/:id", validateBookById, deleteBook);
+router.put(
+  "/:id",
+  authorization("admin", "attendant"),
+  validateBookById,
+  validateUpdateBook,
+  updateBook,
+);
+
+router.delete(
+  "/:id",
+  authorization("admin", "attendant"),
+  validateBookById,
+  deleteBook,
+);
 
 // Borrow book route
 
-router.post("/:id/borrow", validateBorrowBook, borrowBook);
+router.post(
+  "/:id/borrow",
+  authorization("student"),
+  validateBorrowBook,
+  borrowBook,
+);
 
 // Return book route
 
-router.post("/:id/return", validateReturnBook, returnBook);
+router.post(
+  "/:id/return",
+  authorization("student"),
+  validateReturnBook,
+  returnBook,
+);
 
 export default router;

@@ -8,20 +8,25 @@ import {
 } from "../controllers/authorsController.js";
 
 import {
+  validateUpdateAuthor,
   validateCreateAuthor,
   validateAuthorById,
 } from "../middleware/authorValidation/authorValidation.js";
 
-const router = express.Router();
+import authorization from "../middleware/auth/authorization.js";
 
-router.post("/", validateCreateAuthor, createAuthor);
+const router = express.Router();
 
 router.get("/", getAuthors);
 
+router.use(authorization("admin", "attendant"));
+
+router.post("/", validateCreateAuthor, createAuthor);
+
 router.get("/:id", validateAuthorById, getAuthorById);
 
-router.put("/:id", updateAuthor);
+router.put("/:id", validateAuthorById, validateUpdateAuthor, updateAuthor);
 
-router.delete("/:id", deleteAuthor);
+router.delete("/:id", validateAuthorById, deleteAuthor);
 
 export default router;

@@ -8,7 +8,7 @@ export const createLibraryAttendant = async (req, res) => {
   if (!name || !name.trim()) {
     return res
       .status(400)
-      .json({ error: { messsage: "This field is required" } });
+      .json({ error: { message: "This field is required" } });
   }
 
   try {
@@ -32,8 +32,12 @@ export const createLibraryAttendant = async (req, res) => {
       message: `Attendant created successfully`,
       data: newAttendant,
     });
-  } catch (error) {
-    res.status(500).json(error);
+  } catch (err) {
+    res
+      .status(500)
+      .json({ ok: false, error: { message: "cannot create attendant" } });
+
+    console.log(err.message);
   }
 };
 
@@ -44,11 +48,15 @@ export const getLibraryAttendants = async (req, res) => {
     const attendants = await Attendant.find().sort({ name: 1 });
 
     res.status(200).json({
-      okay: true,
+      ok: true,
       message: "Attendants request successful",
       data: attendants,
     });
   } catch (err) {
-    res.status(500).send(err.message);
+    res
+      .status(500)
+      .json({ ok: false, error: { message: "cannot get attendants" } });
+
+    console.log(err.message);
   }
 };

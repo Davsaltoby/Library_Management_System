@@ -6,9 +6,13 @@ import {
   getStudentById,
 } from "../controllers/studentsController.js";
 
+import validateStudent from "../middleware/studentValidation/validateStudent.js";
+
+import authorization from "../middleware/auth/authorization.js";
+
 const router = express.Router();
 
-router.post("/", createStudent);
+router.post("/", authorization("admin"), validateStudent, createStudent);
 
 router.get("/", getStudents);
 

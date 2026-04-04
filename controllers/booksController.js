@@ -23,19 +23,37 @@ export const createBook = async (req, res) => {
   }
 };
 
-// Get Books
+// Get Paginated Books with Search Query functionality
 
 export const getBooks = async (req, res) => {
+  const { search } = req.query;
+  let { page = 1, limit = 5 } = req.query;
+
+  page = Number(page);
+  limit = Number(limit);
+  const skip = (page - 1) * limit;
+
   try {
     const books = await Book.find()
-      .sort({ title: 1 })
+      .sort({ createdAt: -1 })
       .populate("authors", "name bio");
 
-    books.length === 0
-      ? res.status(200).json({ ok: true, message: "No books available" })
-      : res
-          .status(200)
-          .json({ ok: true, message: "Request successful", data: books });
+    const queriedBooks = search
+      ? books.filter(
+          (book) =>
+            book.title.toLowerCase().includes(search.toLowerCase()) ||
+            book.authors.some((author) =>
+              author.name.toLowerCase().includes(search.toLowerCase()),
+            ),
+        )
+      : books;
+
+    res.status(200).json({
+      ok: true,
+      message:
+        queriedBooks.length === 0 ? "No books available" : "Request successful",
+      data: queriedBooks.slice(skip, skip + limit),
+    });
   } catch (err) {
     res.status(500).json({ error: { message: err.message } });
     console.log(err.message);

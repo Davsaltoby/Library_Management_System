@@ -6,9 +6,15 @@ export const createAuthor = async (req, res) => {
   try {
     const author = await Author.create(req.body);
 
-    res.status(201).json({ message: "Author successfully created", author });
+    res
+      .status(201)
+      .json({ ok: true, message: "author successfully created", author });
   } catch (err) {
-    res.status(500).json({ error: { message: err.message } });
+    res
+      .status(500)
+      .json({ ok: false, error: { message: "cannot create author" } });
+
+    console.log(err.message);
   }
 };
 
@@ -17,89 +23,79 @@ export const createAuthor = async (req, res) => {
 export const getAuthors = async (req, res) => {
   try {
     const authors = await Author.find().sort({ name: 1 });
-    if (authors.length === 0) {
-      return res.status(200).json({ message: "No authors found" });
-    }
 
-    res.status(200).json(authors);
+    res.status(200).json({
+      ok: true,
+      message: authors.length === 0 ? "No authors found" : "request successful",
+      data: authors,
+    });
   } catch (err) {
-    res.status(500).json({ error: { message: err.message } });
+    res
+      .status(500)
+      .json({ ok: false, error: { message: "cannot get authors" } });
+
+    console.log(err.message);
   }
 };
 
 // Get author by Id
 
 export const getAuthorById = async (req, res) => {
-  res.status(200).json(req.author);
+  try {
+    res.status(200).json(req.author);
+  } catch (err) {
+    res
+      .status(500)
+      .json({ ok: false, error: { message: "cannot get author" } });
+
+    console.log(err.message);
+  }
 };
 
 // Update author
 
 export const updateAuthor = async (req, res) => {
-  const id = req.params.id;
-  const { name, bio } = req.body;
-
-  if (!name || !name.trim() || !bio) {
-    return res
-      .status(400)
-      .json({ error: { message: "All fields are required" } });
-  }
   try {
-    const author = await Author.findById(id);
-    if (!author) {
-      return res.status(404).json({
-        error: {
-          message: "cannot find author",
-        },
-      });
-    }
+    const author = req.author;
 
-    author.name = name;
-    author.bio = bio;
+    const { name, bio } = req.body;
 
-    await author.save();
+    await author.set({ name, bio }).save();
     res.status(200).json({
-      message: "Author updated successfully",
+      message: "author updated successfully",
       author,
     });
   } catch (err) {
-    res.status(400).json({
+    res.status(500).json({
+      ok: false,
       error: {
-        message: "Invalid author id",
-        details: err.message,
+        message: "cannot update author",
       },
     });
 
-    console.log(err);
+    console.log(err.message);
   }
 };
 
 // Delete author
 
 export const deleteAuthor = async (req, res) => {
-  const id = req.params.id;
+  const author = req.author;
 
   try {
-    const deletedAuthor = await Author.findByIdAndDelete(id);
-    if (!deletedAuthor) {
-      return res.status(404).json({
-        error: {
-          message: "cannot find author",
-        },
-      });
-    } else {
-      res.status(200).json({
-        message: `Author: ${deletedAuthor.name}, has been deleted successfully`,
-      });
-    }
+    await author.deleteOne();
 
-    res.status(200).json({ message: "Author deleted successfully" });
+    res
+      .status(200)
+      .json({ ok: true, message: `author has been deleted successfully` });
   } catch (err) {
-    res.status(400).json({
+    res.status(500).json({
+      ok: false,
       error: {
-        message: "Invalid author id",
-        details: err.message,
+        message: "cannot delete author",
       },
     });
+
+    console.log(err.message);
   }
 };

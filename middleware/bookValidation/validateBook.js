@@ -46,7 +46,7 @@ export const validateCreateBook = async (req, res, next) => {
   );
   if (invalidIds.length > 0) {
     return res.status(400).json({
-      erorr: { message: `Invalid Id format ${invalidIds.join(",")}` },
+      error: { message: `Invalid Id format ${invalidIds.join(",")}` },
     });
   }
 

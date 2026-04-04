@@ -5,9 +5,11 @@ import {
   getLibraryAttendants,
 } from "../controllers/libraryAttendantController.js";
 
+import authorization from "../middleware/auth/authorization.js";
+
 const router = express.Router();
 
-router.post("/", createLibraryAttendant);
+router.post("/", authorization("admin"), createLibraryAttendant);
 
 router.get("/", getLibraryAttendants);
 

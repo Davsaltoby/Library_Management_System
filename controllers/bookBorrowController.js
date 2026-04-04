@@ -1,10 +1,10 @@
 const borrowBook = async (req, res) => {
-  const { studentId, attendantId, returnDate } = req.body;
+  const { returnDate } = req.body;
   try {
     const bookData = {
       status: "OUT",
-      borrowedBy: studentId,
-      issuedBy: attendantId,
+      borrowedBy: req.student._id,
+      issuedBy: req.attendant._id,
       returnDate,
     };
     const borrowedBook = await req.book.set(bookData).save();

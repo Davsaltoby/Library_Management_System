@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Author from "../../models/authorModel.js";
 
 export const validateCreateAuthor = async (req, res, next) => {
@@ -19,25 +20,40 @@ export const validateCreateAuthor = async (req, res, next) => {
 };
 
 export const validateAuthorById = async (req, res, next) => {
-  try {
-    const author = await Author.findById(req.params.id);
-    if (!author) {
-      return res.status(404).json({
-        error: {
-          message: "cannot find author",
-        },
-      });
-    }
+  const invalidId = !mongoose.isValidObjectId(req.params.id);
 
-    req.author = author;
-
-    next();
-  } catch (err) {
-    res.status(400).json({
+  if (invalidId) {
+    return res.status(400).json({
+      ok: false,
       error: {
         message: "Invalid author id",
-        details: err.message,
       },
     });
   }
+
+  const author = await Author.findById(req.params.id);
+  if (!author) {
+    return res.status(404).json({
+      ok: false,
+      error: {
+        message: "cannot find author",
+      },
+    });
+  }
+
+  req.author = author;
+
+  next();
+};
+
+export const validateUpdateAuthor = (req, res, next) => {
+  const { name, bio } = req.body;
+
+  if (!name || !name.trim() || !bio) {
+    return res
+      .status(400)
+      .json({ error: { message: "All fields are required" } });
+  }
+
+  next();
 };
