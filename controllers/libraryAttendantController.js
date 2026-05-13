@@ -45,8 +45,9 @@ export const createLibraryAttendant = async (req, res) => {
 
 export const getLibraryAttendants = async (req, res) => {
   try {
-    const attendants = await Attendant.find().sort({ name: 1 });
-
+    const attendants = await Attendant.find()
+      .sort({ name: 1 })
+      .populate("userId", "email role isActive");
     res.status(200).json({
       ok: true,
       message: "Attendants request successful",

@@ -31,7 +31,9 @@ export const createStudent = async (req, res) => {
 
 export const getStudents = async (req, res) => {
   try {
-    const students = await Student.find().sort({ name: 1 });
+    const students = await Student.find()
+      .sort({ name: 1 })
+      .populate("userId", "email role isActive");
     res
       .status(200)
       .json({ ok: true, message: "Request successful", data: students });
@@ -48,7 +50,10 @@ export const getStudents = async (req, res) => {
 export const getStudentById = async (req, res) => {
   const id = req.params.id;
   try {
-    const student = await Student.findById(id);
+    const student = await Student.findById(id).populate(
+      "userId",
+      "email role isActive",
+    );
     if (!student) {
       return res
         .status(404)

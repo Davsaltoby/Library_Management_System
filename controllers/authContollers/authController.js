@@ -8,7 +8,14 @@ export const signUp = async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await User.create({ email, password: hashedPassword });
+    const user = await User.create({
+      email,
+      password: hashedPassword,
+      role: "student",
+      isActive: true,
+      inviteToken: null,
+      inviteExpiry: null,
+    });
 
     const count = await Student.countDocuments();
 
@@ -16,6 +23,7 @@ export const signUp = async (req, res) => {
 
     const newStudent = await Student.create({
       name,
+      userId: user._id,
       email,
       studentId: studentIdGen,
     });

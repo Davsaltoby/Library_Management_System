@@ -7,6 +7,7 @@ import studentRoutes from "./routes/studentsRoute.js";
 import libraryAttendantRoutes from "./routes/libraryAttendantsRoute.js";
 import authRoutes from "./routes/authRoutes.js";
 import authentication from "./middleware/auth/authentication.js";
+import adminRoutes from "./routes/adminRoutes/adminRoute.js";
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.use(express.json());
 app.use("/auth", authRoutes);
 
 app.use(authentication);
+app.use("/admin", adminRoutes);
 app.use("/authors", authorRoutes);
 app.use("/books", bookRoutes);
 app.use("/students", studentRoutes);

@@ -14,8 +14,8 @@ const router = express.Router();
 
 router.post("/", authorization("admin"), validateStudent, createStudent);
 
-router.get("/", getStudents);
+router.get("/", authorization("admin", "attendant"), getStudents);
 
-router.get("/:id", getStudentById);
+router.get("/:id", authorization("admin", "attendant"), getStudentById);
 
 export default router;

@@ -14,6 +14,7 @@ A backend API for managing library operations: authors, books, students, library
 8. Quick Usage
 9. API Reference
    - Authentication
+   - Admin
    - Authors
    - Books
    - Students
@@ -41,11 +42,14 @@ This project is a Node.js + Express backend for a library management system. It 
 ## 2. Features
 
 - JWT authentication
-- Role-based authorization
+- Role-based authorization (admin, attendant, student)
 - Validation middleware for request payloads
 - MongoDB schema models for books, authors, students, attendants, and users
 - Borrow / return workflow with book status tracking
 - Admin / attendant / student access control
+- Email-based attendant invitation system
+- Account setup with secure token-based invitations
+- Rate-limited endpoints for abuse prevention
 
 ---
 
@@ -55,8 +59,10 @@ This project is a Node.js + Express backend for a library management system. It 
 - Express
 - MongoDB
 - Mongoose
-- JSON Web Tokens
+- JSON Web Tokens (JWT)
 - bcrypt
+- Nodemailer (for sending invitation emails)
+- express-rate-limit (for request rate limiting)
 - dotenv
 - validator
 
@@ -68,6 +74,7 @@ Key folders and files:
 
 - `server.js` — entry point
 - `config/db.js` — MongoDB connection
+- `config/nodeMailer.js` — email configuration
 - `routes/` — route definitions
 - `controllers/` — request handling logic
 - `models/` — Mongoose schemas
@@ -75,11 +82,12 @@ Key folders and files:
 
 Included routes:
 
-- `authRoutes.js`
-- `authorsRoute.js`
-- `booksRoute.js`
-- `studentsRoute.js`
-- `libraryAttendantsRoute.js`
+- `authRoutes.js` — signup, login, setup-account, resend-invite
+- `adminRoutes/adminRoute.js` — admin operations
+- `authorsRoute.js` — CRUD for authors
+- `booksRoute.js` — CRUD for books, borrow, and return operations
+- `studentsRoute.js` — CRUD for students
+- `libraryAttendantsRoute.js` — retrieve attendants
 
 ---
 
@@ -102,9 +110,11 @@ MONGO_URI=<your-mongo-connection-string>
 DB_NAME=Library-Management-System
 JWT_SECRET=<your-jwt-secret>
 PORT=3000
+CLIENT_URL=<your-frontend-url>
 ```
 
-`PORT` is optional; defaults to `3000`.
+- `PORT` is optional; defaults to `3000`
+- `CLIENT_URL` is required for invitation email links (e.g., `http://localhost:3001`)
 
 ---
 
@@ -205,6 +215,65 @@ curl -X POST http://localhost:3000/books \
 - Response:
   - `200 OK`
   - Token expires in 30 minutes
+
+#### POST `/auth/setup-account`
+
+- Sets up a user account after receiving an invitation token.
+- Used by invited attendants to create their password.
+- Request body:
+  ```json
+  {
+    "token": "<invitation-token>",
+    "password": "strongpassword"
+  }
+  ```
+- Response:
+  - `200 OK` on success
+  - Sets `isActive` to `true` and clears invite tokens
+
+#### POST `/auth/resend-invite`
+
+- Resends an invitation email to a user who hasn't set up their account yet.
+- Rate limited to 3 requests per 15 minutes.
+- Request body:
+  ```json
+  {
+    "email": "attendant@example.com"
+  }
+  ```
+- Response:
+  - `200 OK` on success
+  - Generates a new invite token valid for 24 hours
+
+---
+
+### Admin
+
+Requires role: `admin`
+
+#### POST `/admin/register/attendants`
+
+- Invites a new library attendant to the system.
+- Generates an invitation token and sends an email with account setup link.
+- Request body:
+  ```json
+  {
+    "email": "attendant@example.com",
+    "name": "Mary Smith"
+  }
+  ```
+- Response:
+  - `201 Created` on success
+  - Creates a `User` record with role `attendant` and `isActive: false`
+  - Creates a corresponding `LibraryAttendant` record
+  - Staff IDs are generated like `STF-0001`
+
+#### GET `/admin/users`
+
+- Retrieves all users in the system.
+- Response:
+  - `200 OK`
+  - Returns array of users with `userId`, `email`, `role`, `isActive`, `createdAt`, `updatedAt`
 
 ---
 
@@ -340,31 +409,29 @@ curl -X POST http://localhost:3000/books \
 
 ### Library Attendants
 
-#### POST `/attendants`
-
-- Creates a new library attendant record.
-- Requires role: `admin`
-- Request body:
-  ```json
-  {
-    "name": "Mary Smith",
-    "staffId": "STAFF-0001"
-  }
-  ```
-
 #### GET `/attendants`
 
 - Retrieves all library attendants.
 
+#### Note
+
+- New attendants are created through the admin endpoint: `POST /admin/register/attendants`
+- Attendants receive an invitation email and must set up their account using `/auth/setup-account`
+
 ---
 
-## 9. Data Models
+## 10. Data Models
 
 ### User
 
 - `email` — unique
-- `password` — hashed
+- `password` — hashed (null until account is set up)
 - `role` — `student` or `attendant`
+- `isActive` — boolean, `false` until user completes account setup
+- `inviteToken` — temporary token for account setup (expires after 24 hours)
+- `inviteExpiry` — expiration timestamp for invite token
+- `createdAt` — account creation timestamp
+- `updatedAt` — last update timestamp
 
 ### Student
 
@@ -394,13 +461,17 @@ curl -X POST http://localhost:3000/books \
 
 ---
 
-## 10. Notes
+## 11. Notes
 
-- JWT authentication is enforced after `/auth`
-- The `authorization` middleware validates user roles
+- JWT authentication is enforced on all routes except `/auth/signup`, `/auth/login`, `/auth/setup-account`, and `/auth/resend-invite`
+- The `authorization` middleware validates user roles on protected routes
 - Input validation protects author, book, student, borrow, and return operations
 - Use `MONGO_URI` and `JWT_SECRET` in `.env`
 - `npm run dev` uses `nodemon` for live reload
+- Attendant invitations expire after 24 hours
+- Resend-invite endpoint is rate-limited to 3 requests per 15 minutes to prevent abuse
+- Email notifications are sent via Nodemailer when attendants are invited
+- Configure `CLIENT_URL` in `.env` for the account setup link in invitation emails
 
 ---
 

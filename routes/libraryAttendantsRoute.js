@@ -11,6 +11,6 @@ const router = express.Router();
 
 router.post("/", authorization("admin"), createLibraryAttendant);
 
-router.get("/", getLibraryAttendants);
+router.get("/", authorization("admin"), getLibraryAttendants);
 
 export default router;
